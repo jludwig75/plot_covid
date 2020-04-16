@@ -20,7 +20,7 @@ def plot_csv_file(csv_file_name, width, height, max_y, log_scale):
     if not os.path.exists(csv_file_name):
         print('skiping %s because it does not exist' % csv_file_name)
         return
-    output_file_name = csv_file_name
+    output_file_name = os.path.join('plots', os.path.basename(csv_file_name))
     last_dot = output_file_name.rfind('.')
     output_file_name = output_file_name[:last_dot] + '.png'
     print('  plotting %s as %s' % (csv_file_name, output_file_name))
