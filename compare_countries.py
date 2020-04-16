@@ -2,11 +2,18 @@
 from covid.dataset import load_dataset, date_string
 from datetime import datetime
 import argparse
+import os
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('country_list', help='comma separated list of country codes to compare')
 args = arg_parser.parse_args()
-country_list = args.country_list.split(',')
+if args.country_list.lower() == 'all':
+    country_list = []
+    for file_name in os.listdir('country_data'):
+        if file_name.endswith('.csv'):
+            country_list.append(file_name[:-len('.csv')].upper())
+else:
+    country_list = args.country_list.split(',')
 country_list.sort()
 print(country_list)
 
@@ -14,22 +21,24 @@ country_datasets = []
 for geoid in country_list:
     country_datasets.append(load_dataset(geoid))
 
-# Find the latest start date
-latest_start = datetime(year=1900, month=1, day=1)
+days = {}
+# generate a complete database
 for cds in country_datasets:
-    if cds.datapoints[0].date > latest_start:
-        latest_start = cds.datapoints[0].date
+    for dp in cds.datapoints:
+        if dp.date not in days:
+            days[dp.date] = {}
+        assert cds.geoid not in days[dp.date]
+        days[dp.date][cds.geoid] = dp
 
-start_indexes = {}
-counts = []
-for cds in country_datasets:
-    start_index = 0
-    while cds.datapoints[start_index].date < latest_start:
-        start_index += 1
-    start_indexes[cds.geoid] = start_index
-    counts.append(len(cds.datapoints) - start_index)
-rows_to_compare = min(counts)
-file_name_base = 'outputs/compare_' + '_'.join(country_list)
+rows = [(key, value) for key, value in days.items()]
+rows.sort(key = lambda row: row[0])
+for r in rows:
+    print(r[0])
+
+if args.country_list.lower() == 'all':
+    file_name_base = 'outputs/compare_all'
+else:
+    file_name_base = 'outputs/compare_' + '_'.join(country_list)
 
 # generate new cases per 1M pop chart
 file_name = file_name_base + '_new_cases_per_1m.csv'
@@ -39,14 +48,13 @@ with open(file_name, 'wt') as file:
     for cds in country_datasets:
         file.write(',%s_new_cases' % cds.geoid)
     file.write('\n')
-    for r in range(rows_to_compare):
-        first = True
+    for r in rows:
+        file.write('%s' % date_string(r[0]))
         for cds in country_datasets:
-            idx = r + start_indexes[cds.geoid]
-            if first:
-                file.write('%s' % date_string(cds.datapoints[idx].date))
-                first = False
-            file.write(',%.3f' % cds.datapoints[idx].new_cases_per_1m)
+            if cds.geoid in r[1]:
+                file.write(',%.3f' % r[1][cds.geoid].new_cases_per_1m)
+            else:
+                file.write(',')
         file.write('\n')
 
 # generate new deaths per 1M pop chart
@@ -57,14 +65,13 @@ with open(file_name, 'wt') as file:
     for cds in country_datasets:
         file.write(',%s_new_deaths' % cds.geoid)
     file.write('\n')
-    for r in range(rows_to_compare):
-        first = True
+    for r in rows:
+        file.write('%s' % date_string(r[0]))
         for cds in country_datasets:
-            idx = r + start_indexes[cds.geoid]
-            if first:
-                file.write('%s' % date_string(cds.datapoints[idx].date))
-                first = False
-            file.write(',%.3f' % cds.datapoints[idx].new_deaths_per_1m)
+            if cds.geoid in r[1]:
+                file.write(',%.3f' % r[1][cds.geoid].new_deaths_per_1m)
+            else:
+                file.write(',')
         file.write('\n')
 
 # generate cummulative cases per 1M pop chart
@@ -75,14 +82,13 @@ with open(file_name, 'wt') as file:
     for cds in country_datasets:
         file.write(',%s_cum_cases' % cds.geoid)
     file.write('\n')
-    for r in range(rows_to_compare):
-        first = True
+    for r in rows:
+        file.write('%s' % date_string(r[0]))
         for cds in country_datasets:
-            idx = r + start_indexes[cds.geoid]
-            if first:
-                file.write('%s' % date_string(cds.datapoints[idx].date))
-                first = False
-            file.write(',%.3f' % cds.datapoints[idx].cummulative_cases_per_1m)
+            if cds.geoid in r[1]:
+                file.write(',%.3f' % r[1][cds.geoid].cummulative_cases_per_1m)
+            else:
+                file.write(',')
         file.write('\n')
 
 # generate cummulative deaths per 1M pop chart
@@ -93,12 +99,11 @@ with open(file_name, 'wt') as file:
     for cds in country_datasets:
         file.write(',%s_cum_deaths' % cds.geoid)
     file.write('\n')
-    for r in range(rows_to_compare):
-        first = True
+    for r in rows:
+        file.write('%s' % date_string(r[0]))
         for cds in country_datasets:
-            idx = r + start_indexes[cds.geoid]
-            if first:
-                file.write('%s' % date_string(cds.datapoints[idx].date))
-                first = False
-            file.write(',%.3f' % cds.datapoints[idx].cummulative_deaths_per_1m)
+            if cds.geoid in r[1]:
+                file.write(',%.3f' % r[1][cds.geoid].cummulative_deaths_per_1m)
+            else:
+                file.write(',')
         file.write('\n')

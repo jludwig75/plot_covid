@@ -47,7 +47,8 @@ def plot_csv_file(csv_file_name, width, height, max_y, log_scale):
             first_series = True
         else:
             plot_cmd += ', '
-        plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2 lt rgb "%s"' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'), COLOR_PALETTE[i % len(COLOR_PALETTE)])
+        # plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2 lt rgb "%s"' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'), COLOR_PALETTE[i % len(COLOR_PALETTE)])
+        plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'))
     gp.c(plot_cmd)
 
 parser = argparse.ArgumentParser(description='Plot the fields in a CSV file to a PNG file')
