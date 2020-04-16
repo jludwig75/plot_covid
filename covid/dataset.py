@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-COUNTRY_DATA_FILE_NAME = 'country_data.json'
+COUNTRY_DATA_FILE_NAME = 'country_data/country_data.json'
 
 def date_string(dt):
     return '%04u-%02u-%02u' % (dt.year, dt.month, dt.day)
@@ -11,7 +11,7 @@ def _load_country_data():
         return json.loads(file.read())
 
 def _geoid_csv_file_name(geoid):
-    return geoid.lower() + '.csv'
+    return 'country_data/' + geoid.lower() + '.csv'
 
 class CountryDataset:
     def __init__(self, geoid, country_name, population):

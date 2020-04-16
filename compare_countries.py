@@ -29,7 +29,7 @@ for cds in country_datasets:
     start_indexes[cds.geoid] = start_index
     counts.append(len(cds.datapoints) - start_index)
 rows_to_compare = min(counts)
-file_name_base = 'compare_' + '_'.join(country_list)
+file_name_base = 'outputs/compare_' + '_'.join(country_list)
 
 # generate new cases per 1M pop chart
 file_name = file_name_base + '_new_cases_per_1m.csv'

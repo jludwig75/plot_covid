@@ -112,14 +112,7 @@ class CovidParser:
         with open(COUNTRY_DATA_FILE_NAME, 'wt') as file:
             file.write(json.dumps(country_data))
 
-    def _plot_dataset(self):
-        print('Plotting data...')
-        for geoid, cds in self._country_datasets.items():
-            # print('Plotting data file for country %s' % geoid)
-            cds.dump()
-
     def run(self):
         self._download_dataset()
         self._parse_dataset()
         self._save_data_files()
-        # self._plot_dataset()
