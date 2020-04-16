@@ -3,3 +3,4 @@ dataset.xlsx
 *.csv
 country_data.json
 __pycache__
+*.png

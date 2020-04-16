@@ -7,6 +7,7 @@ arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('country_list', help='comma separated list of country codes to compare')
 args = arg_parser.parse_args()
 country_list = args.country_list.split(',')
+country_list.sort()
 print(country_list)
 
 country_datasets = []
