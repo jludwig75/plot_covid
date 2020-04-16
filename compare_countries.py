@@ -1,20 +1,57 @@
 #!/usr/bin/env python3
-from covid.dataset import load_dataset, date_string
+from covid.dataset import load_dataset, date_string, CountryDataset
 from datetime import datetime
 import argparse
 import os
 
+def get_country_csv_file_names():
+    country_list = []
+    for file_name in os.listdir('country_data'):
+        if file_name.lower().endswith('.csv') and not file_name.lower().startswith('jpg'):
+            country_list.append(file_name[:-len('.csv')].upper())
+    country_list.sort()
+    return country_list
+
+def find_top_case_counts(country_list, cmp_func, top_count=10):
+    # print(cmp_func)
+    counts = []
+    for geoid in country_list:
+        cds = load_dataset(geoid)
+        # print(geoid)
+        counts.append((cmp_func(cds), geoid))
+    counts.sort(key=lambda x: -x[0])
+    # print(counts)
+    counts = counts[:top_count]
+    # print(counts)
+    return [x[1] for x in counts]
+
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('country_list', help='comma separated list of country codes to compare')
 args = arg_parser.parse_args()
-if args.country_list.lower() == 'all':
-    country_list = []
-    for file_name in os.listdir('country_data'):
-        if file_name.endswith('.csv'):
-            country_list.append(file_name[:-len('.csv')].upper())
+cl = args.country_list.lower()
+if cl == 'all':
+    country_list = get_country_csv_file_names()
+elif cl.startswith('top'):
+    country_list = get_country_csv_file_names()
+    if cl == 'top_cum_cases_total':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_case_count)
+    elif cl == 'top_new_cases_total':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_new_case_count)
+    elif cl == 'top_cum_deaths_total':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_death_count)
+    elif cl == 'top_new_deaths_total':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_new_death_count)
+    elif cl == 'top_cum_cases_per_1m':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_case_count_per_1m)
+    elif cl == 'top_new_cases_per_1m':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_new_case_count_per_1m)
+    elif cl == 'top_cum_deaths_per_1m':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_death_count_per_1m)
+    elif cl == 'top_new_deaths_per_1m':
+        country_list = find_top_case_counts(country_list, CountryDataset.get_max_new_death_count_per_1m)
 else:
     country_list = args.country_list.split(',')
-country_list.sort()
+    country_list.sort()
 print(country_list)
 
 country_datasets = []
@@ -32,11 +69,11 @@ for cds in country_datasets:
 
 rows = [(key, value) for key, value in days.items()]
 rows.sort(key = lambda row: row[0])
-for r in rows:
-    print(r[0])
 
-if args.country_list.lower() == 'all':
+if cl.lower() == 'all':
     file_name_base = 'outputs/compare_all'
+elif cl.startswith('top'):
+    file_name_base = 'outputs/compare_' + cl
 else:
     file_name_base = 'outputs/compare_' + '_'.join(country_list)
 

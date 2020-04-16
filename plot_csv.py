@@ -4,16 +4,16 @@ import PyGnuplot as gp
 import argparse
 
 COLOR_PALETTE = [
-                    '#FF0000',
-                    '#00FFFF',
-                    '#228b22',
-                    '#984EA3',
-                    '#FF7F00',
-                    '#964B00',
-                    '#000000',
-                    '#FFEC8B',
-                    '#C8B18B',
-                    '#8A8489'
+                    '#FF0000',  # red
+                    '#FF7F00',  # orange
+                    '#FFEC8B',  # yellow
+                    '#228b22',  # green
+                    "#0000FF",  # blue
+                    '#00FFFF',  # cyan
+                    '#984EA3',  # purple
+                    '#FF00FF',  # magenta
+                    '#000000',  # black
+                    '#964B00',  # brown
                 ]
 
 def plot_csv_file(csv_file_name, width, height, max_y, log_scale):
@@ -36,6 +36,8 @@ def plot_csv_file(csv_file_name, width, height, max_y, log_scale):
     gp.c('set output "%s"' % output_file_name)
     gp.c('set datafile separator ","')
     gp.c('set title "%s"' % csv_file_name[:-4].replace('_', ' '))
+    gp.c('set multiplot')
+    gp.c('unset key')
     if log_scale:
         gp.c('set logscale y 10')
     if max_y != 0:
@@ -47,8 +49,17 @@ def plot_csv_file(csv_file_name, width, height, max_y, log_scale):
             first_series = True
         else:
             plot_cmd += ', '
-        # plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2 lt rgb "%s"' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'), COLOR_PALETTE[i % len(COLOR_PALETTE)])
-        plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'))
+        plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2 lt rgb "%s"' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'), COLOR_PALETTE[(i - 1) % len(COLOR_PALETTE)])
+    gp.c(plot_cmd)
+    gp.c('set key')
+    plot_cmd = 'plot [][0:1] '
+    first_series = False
+    for i in range(1, len(fields)):
+        if not first_series:
+            first_series = True
+        else:
+            plot_cmd += ', '
+        plot_cmd += '2 title "%s" lw 4 lt rgb "%s"' % (fields[i].replace(r'_', r'\\_'), COLOR_PALETTE[(i - 1) % len(COLOR_PALETTE)])
     gp.c(plot_cmd)
 
 parser = argparse.ArgumentParser(description='Plot the fields in a CSV file to a PNG file')

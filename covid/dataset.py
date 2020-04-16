@@ -19,6 +19,7 @@ class CountryDataset:
         self._country_name = country_name
         self._population = population
         self._datapoints = []
+        # print(self._geoid, self._population)
 
     def add_datapoint(self, datapoint):
         self._datapoints.append(datapoint)
@@ -47,6 +48,43 @@ class CountryDataset:
     @property
     def datapoints(self):
         return self._datapoints
+    def get_max_case_count(self):
+        return self._datapoints[-1].cummulative_cases
+    def get_max_new_case_count(self):
+        max_value = 0
+        for dp in self._datapoints:
+            if dp.new_cases > max_value:
+                max_value = dp.new_cases
+        return max_value
+    def get_max_case_count_per_1m(self):
+        return self._datapoints[-1].cummulative_cases_per_1m
+    def get_max_new_case_count_per_1m(self):
+        max_value = 0
+        for dp in self._datapoints:
+            if dp.new_cases_per_1m > max_value:
+                max_value = dp.new_cases_per_1m
+        return max_value
+    def get_max_death_count(self):
+        return self._datapoints[-1].cummulative_deaths
+    def get_max_new_death_count(self):
+        max_value = 0
+        for dp in self._datapoints:
+            if dp.new_deaths > max_value:
+                max_value = dp.new_deaths
+        return max_value
+    def get_max_death_count_per_1m(self):
+        return self._datapoints[-1].cummulative_deaths_per_1m
+    def get_max_new_death_count_per_1m(self):
+        max_value = 0
+        # print('max', max_value)
+        for dp in self._datapoints:
+            # if self._geoid == 'US':
+            #    print(dp.new_deaths_per_1m) 
+            if dp.new_deaths_per_1m > max_value:
+                max_value = dp.new_deaths_per_1m
+        # print('get_max_new_death_count_per_1m', max_value)
+        # print('get_max_new_death_count', self.get_max_new_death_count())
+        return max_value
     def dump(self):
         print('%s: %s, %u' % (self._geoid, self._country_name, self._population))
         for dp in self._datapoints:
