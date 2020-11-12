@@ -8,4 +8,4 @@ os.system('rm -f plots/*.png')
 
 os.system('./process_covid_data.py')
 os.system('./run_analysis.py')
-os.system('./plot_csv.py')
+os.system('./generate_plots.py')

@@ -27,6 +27,7 @@ def find_top_case_counts(country_list, cmp_func, top_count=10):
 
 arg_parser = argparse.ArgumentParser()
 arg_parser.add_argument('country_list', help='comma separated list of country codes to compare')
+arg_parser.add_argument('-l', '--label', type=str, default=None, help='label for file name')
 args = arg_parser.parse_args()
 cl = args.country_list.lower()
 if cl == 'all':
@@ -70,7 +71,9 @@ for cds in country_datasets:
 rows = [(key, value) for key, value in days.items()]
 rows.sort(key = lambda row: row[0])
 
-if cl.lower() == 'all':
+if args.label != None:
+    file_name_base = 'outputs/compare_' + args.label
+elif cl.lower() == 'all':
     file_name_base = 'outputs/compare_all'
 elif cl.startswith('top'):
     file_name_base = 'outputs/compare_' + cl

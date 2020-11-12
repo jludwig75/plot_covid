@@ -51,7 +51,7 @@ def plot_csv_file(csv_file_name, width, height, max_y, log_scale):
             plot_cmd += ', '
         plot_cmd += '"%s" using 1:%u with lines title "%s" lw 2 lt rgb "%s"' % (csv_file_name, i + 1, fields[i].replace(r'_', r'\\_'), COLOR_PALETTE[(i - 1) % len(COLOR_PALETTE)])
     gp.c(plot_cmd)
-    gp.c('set key')
+    gp.c('set key; unset tics; unset border; unset xlabel; unset ylabel')
     plot_cmd = 'plot [][0:1] '
     first_series = False
     for i in range(1, len(fields)):

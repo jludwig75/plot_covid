@@ -13,4 +13,6 @@ for plot_type in PLOT_TYPES:
             os.system('./compare_countries.py %s' % sort_tag)
 
 # plot countries of particular interest
-os.system('./compare_countries.py US,IT,ES,CA,AU,AT,FR,SE,UK,DE')
+os.system('./compare_countries.py US,IT,ES,CA,AU,AT,FR,SE,UK,DE -l selections')
+
+os.system('./compare_countries.py US,SE')
